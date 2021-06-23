@@ -5,7 +5,7 @@ import toml
 import logging
 
 default_config = {
-    "sql_uri": "postgres://localhost/pornhub",
+    "sql_uri": "postgresql://localhost/pornhub",
     "location": os.path.expanduser("~/pornhub"),
 }
 
