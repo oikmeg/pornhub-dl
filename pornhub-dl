@@ -1,10 +1,8 @@
 #!/bin/env python3
 
 import sys
-import monkeytype
 from pornhub import main
 
 if __name__ == "__main__":
-    with monkeytype.trace():
-        main()
-        sys.exit(0)
+    main()
+    sys.exit(0)
