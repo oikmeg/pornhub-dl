@@ -3,7 +3,6 @@
 import os
 from datetime import datetime, timedelta
 
-from pornhub.config import config
 from pornhub.db import get_session
 from pornhub.download import download_video, get_user_download_dir
 from pornhub.extractors import (
@@ -14,12 +13,12 @@ from pornhub.extractors import (
     get_playlist_info,
     get_user_info,
 )
-from pornhub.helper import link_duplicate
+from pornhub.helper import get_clip_path, link_duplicate
 from pornhub.logging import logger
 from pornhub.models import Channel, Clip, Playlist, User
 
 
-def get_user(args):
+def get_user(args: dict):
     """Get all information about a user and download their videos."""
     key = args["key"]
     session = get_session()
@@ -40,7 +39,7 @@ def get_user(args):
     session.commit()
 
 
-def get_playlist(args):
+def get_playlist(args: dict):
     """Get all information about the playlist and download it's videos."""
     playlist_id = args["id"]
     session = get_session()
@@ -56,7 +55,7 @@ def get_playlist(args):
     session.commit()
 
 
-def get_channel(args):
+def get_channel(args: dict):
     """Get all information about the channel and download it's videos."""
     channel_id = args["id"]
     session = get_session()
@@ -72,7 +71,7 @@ def get_channel(args):
     session.commit()
 
 
-def get_video(args):
+def get_video(args: dict):
     """Get a single videos."""
     session = get_session()
 
@@ -87,7 +86,7 @@ def get_video(args):
         logger.info("Clip already exists")
         return
 
-    success, info = download_video(args["viewkey"], name=folder)
+    _, info = download_video(args["viewkey"], name=str(folder))
 
     clip.title = info["title"]
     clip.tags = info["tags"]
@@ -99,7 +98,7 @@ def get_video(args):
     session.commit()
 
 
-def update(args):
+def update(args: dict):
     """Get all information about a user and download their videos."""
     session = get_session()
 
@@ -110,15 +109,17 @@ def update(args):
         session.query(User).filter(User.last_scan <= threshold).order_by(User.key).all()
     )
     for user in users:
-        # Re query the user type, since this can change over time
-        print(user.key)
-        info = get_user_info(user.key)
-        user.user_type = info["type"]
+        try:
+            # Re query the user type, since this can change over time
+            logger.info(f"\nStart downloading: {user.name} ({user.user_type})")
+            info = get_user_info(user.key)
+            user.user_type = info["type"]
 
-        logger.info(f"\nStart downloading user: {user.name}")
-        if download_user_videos(session, user):
-            user.last_scan = datetime.now()
-        session.commit()
+            if download_user_videos(session, user):
+                user.last_scan = datetime.now()
+            session.commit()
+        except Exception as e:
+            logger.info(f"Failed download of user with exception {e}")
 
     # Go through all playlists
     playlists = (
@@ -128,10 +129,13 @@ def update(args):
         .all()
     )
     for playlist in playlists:
-        logger.info(f"\nStart downloading playlist: {playlist.name}")
-        if download_playlist_videos(session, playlist):
-            user.last_scan = datetime.now()
-        session.commit()
+        try:
+            logger.info(f"\nStart downloading playlist: {playlist.name}")
+            if download_playlist_videos(session, playlist):
+                playlist.last_scan = datetime.now()
+            session.commit()
+        except Exception as e:
+            logger.info(f"Failed download of user with exception {e}")
 
     # Go through all channels
     channels = (
@@ -141,25 +145,28 @@ def update(args):
         .all()
     )
     for channel in channels:
-        logger.info(f"\nStart downloading channel: {channel.name}")
-        if download_channel_videos(session, channel):
-            user.last_scan = datetime.now()
-        session.commit()
+        try:
+            logger.info(f"\nStart downloading channel: {channel.name}")
+            if download_channel_videos(session, channel):
+                channel.last_scan = datetime.now()
+            session.commit()
+        except Exception as e:
+            logger.info(f"Failed download of user with exception {e}")
 
+    # Retry any failed clips from previous runs
     clips = (
         session.query(Clip)
         .filter(Clip.completed.is_(False))
         .filter(Clip.location.isnot(None))
         .all()
     )
-
     for clip in clips:
         download_video(clip.viewkey, name=os.path.dirname(clip.location))
         clip.completed = True
         session.commit()
 
 
-def rename(args):
+def rename(args: dict):
     """Rename a user."""
     old_key = args["old_key"]
     new_key = args["new_key"]
@@ -192,7 +199,7 @@ def rename(args):
     print(f"user {old_key} has been renamed to {new_key}")
 
 
-def reset(args):
+def reset(args: dict):
     """Reset all videos and schedule for download."""
     session = get_session()
     session.query(Clip).update({"completed": False})
@@ -203,7 +210,7 @@ def reset(args):
     )
 
 
-def remove(args):
+def remove(args: dict):
     """Remove all information about a user/channel/playlist."""
     entity_type = args["type"]
     key = args["key"]
