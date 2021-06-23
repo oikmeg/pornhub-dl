@@ -83,7 +83,7 @@ def get_video(args: dict):
             target_path = get_clip_path(folder, clip.title, clip.extension)
             link_duplicate(clip, target_path)
 
-        logger.info("Clip already exists")
+        logger.warning("Clip already exists")
         return
 
     _, info = download_video(args["viewkey"], name=str(folder))
@@ -119,7 +119,7 @@ def update(args: dict):
                 user.last_scan = datetime.now()
             session.commit()
         except Exception as e:
-            logger.info(f"Failed download of user with exception {e}")
+            logger.error(f"Failed download of user with exception {e}")
 
     # Go through all playlists
     playlists = (
@@ -135,7 +135,7 @@ def update(args: dict):
                 playlist.last_scan = datetime.now()
             session.commit()
         except Exception as e:
-            logger.info(f"Failed download of user with exception {e}")
+            logger.error(f"Failed download of user with exception {e}")
 
     # Go through all channels
     channels = (
@@ -151,7 +151,7 @@ def update(args: dict):
                 channel.last_scan = datetime.now()
             session.commit()
         except Exception as e:
-            logger.info(f"Failed download of user with exception {e}")
+            logger.error(f"Failed download of user with exception {e}")
 
     # Retry any failed clips from previous runs
     clips = (
