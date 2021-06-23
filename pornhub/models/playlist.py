@@ -1,9 +1,9 @@
 """The db model for a playlist."""
+from __future__ import annotations
+
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, func
-from sqlalchemy.types import (
-    DateTime,
-    String,
-)
+from sqlalchemy.types import DateTime, String
 
 from pornhub.db import base
 
@@ -25,7 +25,7 @@ class Playlist(base):
         self.name = name
 
     @staticmethod
-    def get_or_create(session, playlist_id, name):
+    def get_or_create(session: scoped_session, playlist_id, name):
         """Get an existing playlist or create a new one."""
         playlist = session.query(Playlist).get(playlist_id)
 

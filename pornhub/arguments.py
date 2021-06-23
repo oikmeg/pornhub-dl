@@ -1,12 +1,13 @@
 """Commandline argument handling."""
 import argparse
+
 from pornhub.pornhub import (
     get_channel,
     get_playlist,
     get_user,
     get_video,
-    rename,
     remove,
+    rename,
     reset,
     update,
 )
@@ -15,7 +16,8 @@ parser = argparse.ArgumentParser(description="Download your favorite pornhub stu
 
 # Initialize supbparser
 subparsers = parser.add_subparsers(
-    title="Pornhub download functionality", description="Download all the porn",
+    title="Pornhub download functionality",
+    description="Download all the porn",
 )
 
 # Get a specific video
@@ -30,7 +32,8 @@ get_video_sp.add_argument(
     help="The folder to which it's saved. Default is `single_videos`",
 )
 get_video_sp.set_defaults(
-    func=get_video, folder="single_videos",
+    func=get_video,
+    folder="single_videos",
 )
 
 # Get all videos from a user

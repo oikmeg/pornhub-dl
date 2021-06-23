@@ -1,8 +1,9 @@
 """Config values for pornhub."""
+import logging
 import os
 import sys
+
 import toml
-import logging
 
 default_config = {
     "sql_uri": "postgresql://localhost/pornhub",

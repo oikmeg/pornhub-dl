@@ -5,18 +5,18 @@ from datetime import datetime, timedelta
 
 from pornhub.config import config
 from pornhub.db import get_session
-from pornhub.logging import logger
-from pornhub.helper import link_duplicate
-from pornhub.models import User, Playlist, Clip, Channel
 from pornhub.download import download_video, get_user_download_dir
 from pornhub.extractors import (
-    get_channel_info,
-    get_user_info,
-    get_playlist_info,
     download_channel_videos,
-    download_user_videos,
     download_playlist_videos,
+    download_user_videos,
+    get_channel_info,
+    get_playlist_info,
+    get_user_info,
 )
+from pornhub.helper import link_duplicate
+from pornhub.logging import logger
+from pornhub.models import Channel, Clip, Playlist, User
 
 
 def get_user(args):

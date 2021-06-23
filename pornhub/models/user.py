@@ -1,11 +1,10 @@
 """The db model for a user."""
+from __future__ import annotations
+
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, func
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import (
-    Boolean,
-    DateTime,
-    String,
-)
+from sqlalchemy.types import Boolean, DateTime, String
 
 from pornhub.db import base
 
@@ -27,7 +26,7 @@ class User(base):
     last_scan = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    clips = relationship("Clip")
+    clips = relationship("Clip", viewonly=True)
 
     def __init__(self, key, name, user_type):
         """Create a new user."""
@@ -35,7 +34,10 @@ class User(base):
         self.name = name
         self.user_type = user_type
 
-    def get_or_create(session, key, name, user_type):
+    @staticmethod
+    def get_or_create(
+        session: scoped_session, key: str, name: str, user_type: str
+    ) -> User:
         """Get an existing user or create a new one."""
         user = session.query(User).get(key)
 

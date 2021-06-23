@@ -1,11 +1,11 @@
 """Entry point for pornhub downloader."""
 import sys
 
-from pornhub.db import create_db
 from pornhub.arguments import parser
+from pornhub.db import create_db
 
 
-def main():
+def main() -> None:
     """Parse args, check if everything is ok and start pornhub."""
     args = parser.parse_args()
 

@@ -1,18 +1,21 @@
 """Helper for extracting meta information from pornhub."""
-import re
 import os
+import re
 import sys
 import time
-import requests
+from typing import Any, Dict, List, Tuple, Optional
+
 from bs4 import BeautifulSoup
+from sqlalchemy.orm.scoping import scoped_session
 
-from pornhub.models import User, Clip
+from pornhub.download import download_video, get_soup
+from pornhub.helper import check_logged_out, get_clip_path, link_duplicate
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate, check_logged_out
-from pornhub.download import get_soup, download_video
+from pornhub.models import Clip, User
+from pornhub.models.user import User
 
 
-def download_user_videos(session, user):
+def download_user_videos(session: scoped_session, user: User) -> bool:
     """Download all videos of a user."""
     video_viewkeys = get_user_video_viewkeys(user)
 
@@ -66,10 +69,10 @@ def download_user_videos(session, user):
     return full_success
 
 
-def get_user_info(key):
+def get_user_info(key: str) -> Dict[str, str]:
     """Get all necessary user information."""
     user_type, url, soup = get_user_type_and_url(key)
-    name = get_user_name_from_soup(soup, "user")
+    name = get_user_name_from_soup(soup)
     if name is None:
         logger.error(f"Couldn't get user info for {key}")
         sys.exit(1)
@@ -85,7 +88,7 @@ def get_user_info(key):
     }
 
 
-def get_user_type_and_url(key):
+def get_user_type_and_url(key: str) -> Tuple[str, str, BeautifulSoup]:
     """Detect the user type and the respective url for this user."""
     possible_urls = {}
     for user_type in [User.PORNSTAR, User.MODEL, User.USER]:
@@ -100,7 +103,7 @@ def get_user_type_and_url(key):
     raise Exception(f"Couldn't detect type for user {key}")
 
 
-def get_user_name_from_soup(soup, website_type):
+def get_user_name_from_soup(soup: BeautifulSoup) -> Optional[str]:
     """Get the name of the user by website."""
     profileHeader = soup.find("section", {"class": "topProfileHeader"})
     if profileHeader is None:
@@ -124,7 +127,7 @@ def get_user_name_from_soup(soup, website_type):
     return None
 
 
-def get_user_video_url(user_type, key):
+def get_user_video_url(user_type: str, key: str) -> str:
     """Compile the user videos url."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -133,7 +136,7 @@ def get_user_video_url(user_type, key):
     return f"https://www.pornhub.com/{user_type}/{key}"
 
 
-def get_user_video_viewkeys(user):
+def get_user_video_viewkeys(user: User) -> List[Any]:
     """Scrape viewkeys from the user's user/videos route."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -147,7 +150,6 @@ def get_user_video_viewkeys(user):
         return []
 
     pages = 1
-    hasNavigation = False
     hasEndlessScrolling = False
 
     # Some sites have a navigation at the bottom
@@ -155,7 +157,6 @@ def get_user_video_viewkeys(user):
     if navigation is not None:
         children = navigation.findChildren("li", {"class": "page_number"})
         pages = len(children) + 1
-        hasNavigation = True
     # Others have a button for "endless scrolling"
     # In that case we have to search as long as
     elif soup.find(id="moreDataBtnStream"):
@@ -194,7 +195,7 @@ def get_user_video_viewkeys(user):
     return keys
 
 
-def get_video_upload_viewkeys(user, public=False):
+def get_video_upload_viewkeys(user: User, public: bool = False) -> List[str]:
     """Scrape viewkeys from the user's user/videos/upload route."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -216,7 +217,6 @@ def get_video_upload_viewkeys(user, public=False):
         return []
 
     pages = 1
-    hasNavigation = False
     hasEndlessScrolling = False
 
     # Some sites have a navigation at the bottom
@@ -224,7 +224,6 @@ def get_video_upload_viewkeys(user, public=False):
     if navigation is not None:
         children = navigation.findChildren("li", {"class": "page_number"})
         pages = len(children) + 1
-        hasNavigation = True
     # Others have a button for "endless scrolling"
     # In that case we have to search as long as
     elif soup.find(id="moreDataBtnStream"):

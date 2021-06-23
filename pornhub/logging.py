@@ -1,8 +1,8 @@
 """Logging for encarne."""
+import logging
 import os
 import sys
 import time
-import logging
 
 # Logger init and logger format
 sys_logger = logging.getLogger("")
@@ -18,7 +18,7 @@ sys_logger.addHandler(channel_handler)
 class Logger:
     """Custom logger to always get instant flushes."""
 
-    def info(self, message):
+    def info(self, message: str) -> None:
         sys_logger.info(message)
         channel_handler.flush()
 

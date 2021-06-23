@@ -1,14 +1,13 @@
 """Playlist extracting logic."""
-import re
 import os
+import re
+import sys
 import time
-import requests
-from bs4 import BeautifulSoup
 
-from pornhub.models import Clip
+from pornhub.download import download_video, get_soup
+from pornhub.helper import check_logged_out, get_clip_path, link_duplicate
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate
-from pornhub.download import get_soup, download_video
+from pornhub.models import Clip
 
 
 def download_playlist_videos(session, playlist):
@@ -48,7 +47,7 @@ def download_playlist_videos(session, playlist):
     return full_success
 
 
-def get_playlist_video_url(playlist_id):
+def get_playlist_video_url(playlist_id: str) -> str:
     """Compile the user videos url."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -57,7 +56,7 @@ def get_playlist_video_url(playlist_id):
     return f"https://www.pornhub.com/playlist/{playlist_id}"
 
 
-def get_playlist_info(playlist_id):
+def get_playlist_info(playlist_id: str):
     """Get meta information from playlist website."""
     url = get_playlist_video_url(playlist_id)
     soup = get_soup(url)
@@ -71,7 +70,7 @@ def get_playlist_info(playlist_id):
         check_logged_out(soup)
         sys.exit(1)
 
-    link = header.find_all("a")[0]
+    link = header.find_all("h1")[0]
 
     name = link.text.strip()
     name = name.replace(" ", "_")

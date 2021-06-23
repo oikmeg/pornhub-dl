@@ -1,23 +1,25 @@
 """Module for actually getting data and downloading videos from Pornhub."""
-import os
 import http
+import os
 import time
 import traceback
+from typing import Any, Dict, Optional, Tuple
+
 import requests
 import youtube_dl
-from youtube_dl.utils import DownloadError
 from bs4 import BeautifulSoup
+from youtube_dl.utils import DownloadError
 
-from pornhub.logging import logger
 from pornhub.config import config
+from pornhub.logging import logger
 
 
-def get_user_download_dir(name):
+def get_user_download_dir(name: str) -> str:
     """Get the download key for a user."""
     return os.path.join(config["location"], name)
 
 
-def get_cookies():
+def get_cookies() -> None:
     """Get the cookies from the cookie_file"""
     if not os.path.exists("http_cookie_file"):
         return None
@@ -34,7 +36,7 @@ def get_cookies():
     return cookies_jar
 
 
-def get_soup(url, allow_redirects=True):
+def get_soup(url: str, allow_redirects: bool = True) -> Optional[BeautifulSoup]:
     """Get new soup instance from url."""
     tries = 0
     while True:
@@ -65,7 +67,9 @@ def get_soup(url, allow_redirects=True):
         return soup
 
 
-def download_video(viewkey, name="single_videos"):
+def download_video(
+    viewkey: str, name: str = "single_videos"
+) -> Tuple[bool, Dict[str, Any]]:
     """Download the video."""
     # Decide which domain should be used, depending if the user has a premium account
     is_premium = os.path.exists("cookie_file")

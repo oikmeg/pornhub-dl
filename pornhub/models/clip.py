@@ -1,14 +1,16 @@
 """The db model for a Movie."""
+from __future__ import annotations
+
+from typing import Optional
+
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.types import (
-    Boolean,
-    DateTime,
-    String,
-)
+from sqlalchemy.orm import relationship
+from sqlalchemy.types import Boolean, DateTime, String
 
 from pornhub.db import base
+from pornhub.models.user import User
 
 
 class Clip(base):
@@ -17,11 +19,6 @@ class Clip(base):
     __tablename__ = "movie"
 
     viewkey = Column(String, primary_key=True)
-    user_key = Column(
-        String,
-        ForeignKey("user.key", ondelete="cascade", onupdate="cascade", name="user"),
-        index=True,
-    )
     title = Column(String)
     extension = Column(String)
     location = Column(String)
@@ -30,6 +27,11 @@ class Clip(base):
     tags = Column(JSONB)
     categories = Column(JSONB)
 
+    user_key = Column(
+        String,
+        ForeignKey("user.key", ondelete="cascade", onupdate="cascade"),
+        index=True,
+    )
     user = relationship("User")
 
     def __init__(self, viewkey, user=None):
@@ -37,7 +39,10 @@ class Clip(base):
         self.viewkey = viewkey
         self.user = user
 
-    def get_or_create(session, viewkey, user=None):
+    @staticmethod
+    def get_or_create(
+        session: scoped_session, viewkey: str, user: Optional[User] = None
+    ) -> Clip:
         """Get an existing clip or create a new one."""
         clip = session.query(Clip).get(viewkey)
 

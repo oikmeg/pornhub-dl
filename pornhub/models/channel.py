@@ -1,9 +1,9 @@
 """The db model for a channel."""
+from __future__ import annotations
+
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, func
-from sqlalchemy.types import (
-    DateTime,
-    String,
-)
+from sqlalchemy.types import DateTime, String
 
 from pornhub.db import base
 
@@ -25,7 +25,7 @@ class Channel(base):
         self.name = name
 
     @staticmethod
-    def get_or_create(session, channel_id, name):
+    def get_or_create(session: scoped_session, channel_id: str, name: str) -> Channel:
         """Get an existing channel or create a new one."""
         channel = session.query(Channel).get(channel_id)
 

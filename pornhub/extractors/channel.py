@@ -1,23 +1,25 @@
 """Helper for extracting meta information from pornhub."""
-import re
 import os
+import re
 import sys
 import time
-import requests
-from bs4 import BeautifulSoup
+from typing import Dict, List
 
-from pornhub.models import User, Clip
+from sqlalchemy.orm.scoping import scoped_session
+
+from pornhub.download import download_video, get_soup
+from pornhub.helper import check_logged_out, get_clip_path, link_duplicate
 from pornhub.logging import logger
-from pornhub.helper import get_clip_path, link_duplicate, check_logged_out
-from pornhub.download import get_soup, download_video
+from pornhub.models import Clip
+from pornhub.models.channel import Channel
 
 
-def download_channel_videos(session, channel):
+def download_channel_videos(session: scoped_session, channel: Channel) -> bool:
     """Download all videos of a user."""
     viewkeys = set(get_channel_viewkeys(channel))
 
     if len(viewkeys) == 0:
-        logger.error(f"Found 0 videos for user {user.key}. Aborting")
+        logger.error(f"Found 0 videos for user {channel.name}. Aborting")
         sys.exit(1)
 
     full_success = True
@@ -53,7 +55,7 @@ def download_channel_videos(session, channel):
     return full_success
 
 
-def get_channel_video_url(channel_id):
+def get_channel_video_url(channel_id: str) -> str:
     """Compile the channel videos url."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -62,7 +64,7 @@ def get_channel_video_url(channel_id):
     return f"https://www.pornhub.com/channels/{channel_id}"
 
 
-def get_channel_info(channel_id):
+def get_channel_info(channel_id: str) -> Dict[str, str]:
     """Get meta information from channel website."""
     url = get_channel_video_url(channel_id)
     soup = get_soup(url)
@@ -87,7 +89,7 @@ def get_channel_info(channel_id):
     return {"name": name}
 
 
-def get_channel_viewkeys(channel):
+def get_channel_viewkeys(channel: Channel) -> List[str]:
     """Scrape all public viewkeys of the channel's videos."""
     is_premium = os.path.exists("http_cookie_file")
     if is_premium:
@@ -102,7 +104,6 @@ def get_channel_viewkeys(channel):
         sys.exit(1)
 
     pages = 1
-    hasNavigation = False
     hasEndlessScrolling = False
 
     # Some sites have a navigation at the bottom
@@ -110,7 +111,6 @@ def get_channel_viewkeys(channel):
     if navigation is not None:
         children = navigation.findChildren("li", {"class": "page_number"})
         pages = len(children) + 1
-        hasNavigation = True
     # Others have a button for "endless scrolling"
     # In that case we have to search as long as
     elif soup.find(id="moreDataBtnStream"):
