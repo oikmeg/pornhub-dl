@@ -6,7 +6,7 @@ from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy_utils.functions import create_database, database_exists
 
-from pornhub.config import config
+from .config import config
 
 engine = create_engine(config["sql_uri"])
 base = declarative_base(bind=engine)

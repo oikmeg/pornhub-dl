@@ -8,14 +8,21 @@ repository = "https://github.com/nukesor/pornhub"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+
+# Config/core
+toml = "^0.10"
+click = "^8"
+
+# Scraping
 requests = "^2.23"
 beautifulsoup4 = "^4"
 youtube_dl = "^2021"
+
+# Database
 alembic = "^1"
 SQLAlchemy = "^1"
 sqlalchemy-utils = "^0.37"
 psycopg2-binary = "^2.8"
-toml = "^0.10"
 
 [build-system]
 requires = ["poetry>=0.12"]

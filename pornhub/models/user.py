@@ -1,12 +1,12 @@
 """The db model for a user."""
 from __future__ import annotations
 
-from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.types import Boolean, DateTime, String
 
-from pornhub.db import base
+from pornhub.core.db import base
 
 
 class User(base):

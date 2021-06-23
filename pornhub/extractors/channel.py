@@ -7,9 +7,9 @@ from typing import Dict, List
 
 from sqlalchemy.orm.scoping import scoped_session
 
+from pornhub.core import logger
 from pornhub.download import download_video, get_soup
 from pornhub.helper import check_logged_out, get_clip_path, link_duplicate
-from pornhub.logging import logger
 from pornhub.models import Clip
 from pornhub.models.channel import Channel
 
@@ -36,8 +36,8 @@ def download_channel_videos(session: scoped_session, channel: Channel) -> bool:
 
             continue
 
-        success, info = download_video(viewkey, channel.name)
-        if success:
+        info = download_video(viewkey, channel.name)
+        if info is not None:
             clip.title = info["title"]
             clip.tags = info["tags"]
             clip.cartegories = info["categories"]

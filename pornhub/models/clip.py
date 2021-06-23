@@ -3,13 +3,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.types import Boolean, DateTime, String
 
-from pornhub.db import base
+from pornhub.core.db import base
 from pornhub.models.user import User
 
 

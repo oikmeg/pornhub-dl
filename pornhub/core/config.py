@@ -1,5 +1,4 @@
 """Config values for pornhub."""
-import logging
 import os
 import sys
 

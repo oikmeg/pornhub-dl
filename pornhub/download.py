@@ -1,17 +1,15 @@
 """Module for actually getting data and downloading videos from Pornhub."""
-import http
 import os
 import time
 import traceback
-from typing import Any, Dict, Optional, Tuple
+from typing import Dict, Optional
 
 import requests
 import youtube_dl
 from bs4 import BeautifulSoup
 from youtube_dl.utils import DownloadError
 
-from pornhub.config import config
-from pornhub.logging import logger
+from pornhub.core import config, logger
 
 
 def get_user_download_dir(name: str) -> str:
@@ -19,7 +17,7 @@ def get_user_download_dir(name: str) -> str:
     return os.path.join(config["location"], name)
 
 
-def get_cookies() -> None:
+def get_cookies() -> Optional[dict[str, str]]:
     """Get the cookies from the cookie_file"""
     if not os.path.exists("http_cookie_file"):
         return None
@@ -69,7 +67,7 @@ def get_soup(url: str, allow_redirects: bool = True) -> Optional[BeautifulSoup]:
 
 def download_video(
     viewkey: str, name: str = "single_videos"
-) -> Tuple[bool, Dict[str, Any]]:
+) -> Optional[Dict[str, str]]:
     """Download the video."""
     # Decide which domain should be used, depending if the user has a premium account
     is_premium = os.path.exists("cookie_file")
@@ -96,7 +94,9 @@ def download_video(
             logger.info(f"Start downloading: {video_url}")
             info = ydl.extract_info(video_url)
             info["out_path"] = f'~/pornhub/{name}/{info["title"]}.{info["ext"]}'
-            return True, info
+            logger.info(f"Finished downloading clip")
+            time.sleep(6)
+            return info
         except TypeError:
             # This is an error that seems to occurr from time to time
             # A short wait and retry often seems to fix the problem
@@ -107,13 +107,10 @@ def download_video(
 
             # If this happens too many times, something else must be broken.
             if tries > 10:
-                return False, None
+                return None
             continue
         except DownloadError:
             # We got a download error.
             # Ignore for now and continue downloading the other videos
             logger.error(f"DownloadError: Failed to download video: {viewkey}.")
-            return False, None
-
-        time.sleep(6)
-    return False, None
+            return None

@@ -1,11 +1,11 @@
 """The db model for a playlist."""
 from __future__ import annotations
 
-from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy import Column, func
+from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.types import DateTime, String
 
-from pornhub.db import base
+from pornhub.core.db import base
 
 
 class Playlist(base):

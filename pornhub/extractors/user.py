@@ -3,14 +3,14 @@ import os
 import re
 import sys
 import time
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from bs4 import BeautifulSoup
 from sqlalchemy.orm.scoping import scoped_session
 
+from pornhub.core import logger
 from pornhub.download import download_video, get_soup
 from pornhub.helper import check_logged_out, get_clip_path, link_duplicate
-from pornhub.logging import logger
 from pornhub.models import Clip, User
 from pornhub.models.user import User
 
@@ -49,8 +49,8 @@ def download_user_videos(session: scoped_session, user: User) -> bool:
 
             continue
 
-        success, info = download_video(viewkey, user.name)
-        if success:
+        info = download_video(viewkey, user.name)
+        if info is not None:
             clip.title = info["title"]
             clip.tags = info["tags"]
             clip.cartegories = info["categories"]

@@ -1,6 +1,6 @@
 import os
 
-from pornhub.logging import logger
+from pornhub.core import logger
 
 
 def get_clip_path(folder, title, extension):
@@ -9,7 +9,7 @@ def get_clip_path(folder, title, extension):
 
 
 def link_duplicate(clip, new_path):
-    """Handle multiple references to a clip
+    """Handle multiple references to a clip.
 
     If a clip has already been downloaded, but is used in another source as well,
     symlink the existing file to the new location.
