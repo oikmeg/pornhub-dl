@@ -6,7 +6,7 @@ from pornhub.models import Channel, Playlist, User
 
 @click.command(help="Remove stuff from the database")
 @click.argument(
-    "type",
+    "entity_type",
     type=click.Choice(["user", "playlist", "channel"], case_sensitive=False),
 )
 @click.argument("entity_id")
