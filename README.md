@@ -8,6 +8,14 @@ I haven't used this project in ages. Stuff might work, it might not work. \
 Fixes and PR's are always welcome, but it might take a while for them to be reviewed and merged.
 This project has a very low priority in my current schedule ;D.
 
+
+**Further Disclaimer**
+
+This project is not associated in any way with the operators of the official pornhub.com
+It's just a small and fun side-project in reaction to
+1. Possibly imminent media censorship in the EU through upload filters.
+2. Free global premium in 2020.
+
 ## Setup
 
 1. You will need `poetry` for dependency management and venv creation: `poetry install`
@@ -65,8 +73,3 @@ https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/
 On top of that, create a second file `http_cookie_file`
 Simply copy the `Cookie` header of any logged in pornhub premium domain request.
 Those can be extracted using your browser's network debugging tool.
-
-**Disclaimer:**
-
-This project is not associated in any way with the operators of the official pornhub.com
-It's just a small and fun side-project in reaction to the possibly imminent censorship in the EU and free global premium.
