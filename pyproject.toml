@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/nukesor/pornhub"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8, <4"
 
 # Config/core
 toml = "^0.10"
@@ -21,7 +21,7 @@ youtube_dl = "^2021"
 # Database
 alembic = "^1"
 SQLAlchemy = "^1"
-sqlalchemy-utils = "^0.37"
+sqlalchemy-utils = "^0.38"
 psycopg2-binary = "^2.8"
 
 [build-system]
