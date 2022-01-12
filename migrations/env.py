@@ -9,9 +9,9 @@ from logging.config import fileConfig
 parent_dir = os.path.abspath(os.path.join(os.getcwd()))
 sys.path.append(parent_dir)
 
-from pornhub.db import base  # noqa
-from pornhub.models import *  # noqa
-from pornhub.config import config as pornhub_config  # noqa
+from pornhub.core.db import base
+from pornhub.models import *
+from pornhub.core.config import config as pornhub_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
