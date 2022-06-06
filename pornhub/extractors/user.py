@@ -245,7 +245,7 @@ def get_video_upload_viewkeys(user: User, public: bool = False) -> List[str]:
 
         # Users with normal video upload list
         if videoSection is not None:
-            videos = videoSection.find(id="moreData")
+            videos = videoSection.find()
         # Users with pornstarVideoSection
         elif pornstarVideoSection is not None:
             videos = pornstarVideoSection
